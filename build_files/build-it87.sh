@@ -3,7 +3,6 @@
 set -ouex pipefail
 
 IT87_COMMIT="bd7a566c8a60fe0308d67e26761e16260368191a"
-[[ "${IT87_COMMIT}" != "bd7a566c8a60fe0308d67e26761e16260368191a" ]]
 
 KVER="$(ls /usr/lib/modules)"
 KDIR="/usr/src/kernels/${KVER}"
