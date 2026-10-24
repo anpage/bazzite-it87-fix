@@ -18,5 +18,7 @@ chown akmods:akmods "${OUTDIR}"
 mapfile -t RPMS < <(find "${OUTDIR}" -type f -name 'kmod-vhba-*.rpm' \
     ! -name '*.src.rpm' ! -name '*debug*')
 [[ ${#RPMS[@]} -eq 1 ]]
-rpm -qlp "${RPMS[0]}" | grep -q "/usr/lib/modules/${KVER}/extra/vhba/vhba.ko"
+FILES="$(rpm -qlp "${RPMS[0]}")"
+echo "${FILES}"
+[[ "${FILES}" =~ /lib/modules/${KVER}/extra/vhba/vhba\.ko ]]
 install -Dm0644 "${RPMS[0]}" "/out/rpms/$(basename "${RPMS[0]}")"
