@@ -5,18 +5,17 @@ FROM scratch AS ctx
 COPY build_files /
 COPY system_files /system_files
 
-# Build the out-of-tree it87 driver (frankcrawford/it87)
-FROM ${BASE_IMAGE} AS it87-builder
+FROM ${BASE_IMAGE} AS kmod-builder
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,dst=/var/cache \
     --mount=type=tmpfs,dst=/tmp \
-    /ctx/build-it87.sh
+    /ctx/build-it87.sh && /ctx/build-vhba.sh
 
 # Base Image
 FROM ${BASE_IMAGE}
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-    --mount=type=bind,from=it87-builder,source=/out,target=/it87 \
+    --mount=type=bind,from=kmod-builder,source=/out,target=/kmods \
     --mount=type=cache,dst=/var/cache \
     --mount=type=cache,dst=/var/log \
     --mount=type=tmpfs,dst=/tmp \
