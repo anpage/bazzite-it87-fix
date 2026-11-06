@@ -9,7 +9,7 @@ FROM ${BASE_IMAGE} AS kmod-builder
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,dst=/var/cache \
     --mount=type=tmpfs,dst=/tmp \
-    /ctx/build-it87.sh && /ctx/build-vhba.sh
+    /ctx/build-it87.sh
 
 # Base Image
 FROM ${BASE_IMAGE}

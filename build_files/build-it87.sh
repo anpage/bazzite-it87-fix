@@ -2,6 +2,10 @@
 
 set -ouex pipefail
 
+# The in-tree driver (Linux >= 7.1) detects the IT8689E on the Gigabyte X570S
+# AORUS ELITE but manual PWM writes have no effect.
+# The fork's MMIO/H2RAM support makes fan control work.
+# Details and test results: https://github.com/ublue-os/akmods/issues/382
 IT87_COMMIT="bd7a566c8a60fe0308d67e26761e16260368191a"
 
 KVER="$(ls /usr/lib/modules)"

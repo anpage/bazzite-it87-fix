@@ -5,28 +5,21 @@ set -ouex pipefail
 # Copy the contents of system_files/ of the git repo to /
 cp -avf "/ctx/system_files"/. /
 
+# it87: replace the in-tree module with the out-of-tree build (see build-it87.sh)
 KVER="$(ls /usr/lib/modules)"
 [[ "$(cat /kmods/kver)" == "${KVER}" ]]
 rm -f "/usr/lib/modules/${KVER}/kernel/drivers/hwmon/it87.ko"*
 install -Dm0644 /kmods/it87.ko "/usr/lib/modules/${KVER}/extra/it87.ko"
 depmod -a "${KVER}"
 
-# CoolerControl
-cp /etc/yum.repos.d/terra.repo /tmp/terra.repo.bak
-sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/terra.repo
-dnf5 install -y coolercontrol liquidctl
-cp /tmp/terra.repo.bak /etc/yum.repos.d/terra.repo
-systemctl enable coolercontrold.service
-
 # CDEmu
-dnf5 -y copr enable rok/cdemu
-dnf5 -y copr enable rodoma92/kde-cdemu-manager
-dnf5 install -y --exclude=akmod-vhba,kmod-vhba \
-    /kmods/rpms/kmod-vhba-*.rpm vhba cdemu-daemon cdemu-client kde-cdemu-manager-kf6
-dnf5 -y copr disable rodoma92/kde-cdemu-manager
-dnf5 -y copr disable rok/cdemu
-depmod -a "${KVER}"
 modinfo -k "${KVER}" -F filename vhba
+rpm -q kmod-vhba vhba
+dnf5 -y copr enable rodoma92/kde-cdemu-manager
+dnf5 install -y --enable-repo='copr:copr.fedorainfracloud.org:rok:cdemu' \
+    --exclude=akmod-vhba,dkms-vhba \
+    cdemu-daemon cdemu-client kde-cdemu-manager
+dnf5 -y copr disable rodoma92/kde-cdemu-manager
 
 for pkg in akmod-vhba dkms-vhba; do
     if rpm -q "${pkg}" &>/dev/null; then
